@@ -14,6 +14,12 @@ public class AntBehaviour : MonoBehaviour {
 	Vector2 targetPos;
 	enum MoveType {NONE, HORIZONTAL, VERTICAL, LANDSLIDE};
 
+    float indicatorPeriod = 1.0f; //The time required to make one trip from edge to edge for indicator bar
+    float indicatorMultiplier = 0f; //The multiplier to the current chance
+    float INDICATOR_MAX_MULTIPLIER = 2.0f;
+    float INDICATOR_MIN_MULTIPLIER = 0f;
+    float additionalLandSlideChance_vertical = 1.2f; //The probability multiplier each time a vertical move succeeds
+    
 	struct SlideProbs {public float horizontal; public float vertical;}
 	SlideProbs probabilities = new SlideProbs { horizontal = 0.1f, vertical = 0.5f };
 	MoveType movementType = MoveType.NONE;
@@ -51,6 +57,7 @@ public class AntBehaviour : MonoBehaviour {
 		antPos.x = (int)(gridMaker.gridSizeHorizontal / 2.0f);
 		targetPos = antPos;
 
+      
 
 		ResetProbabilities();
 		UpdateMovement ();
@@ -69,18 +76,18 @@ public class AntBehaviour : MonoBehaviour {
 	void ResetProbabilities() {
 		switch (globalState.difficulty) {
 		case GlobalState.Difficulty.EASY: {
-			probabilities.horizontal = 0.1f;
+			probabilities.horizontal = 0.2f;
 			probabilities.vertical = 0.3f;
 			break;
 		}
 		case GlobalState.Difficulty.MEDIUM: {
-			probabilities.horizontal = 0.1f;
-			probabilities.vertical = 0.5f;
+			probabilities.horizontal = 0.25f;
+			probabilities.vertical = 0.4f;
 			break;
 		}
 		case GlobalState.Difficulty.HARD: {
-			probabilities.horizontal = 0.2f;
-			probabilities.vertical = 0.7f;
+			probabilities.horizontal = 0.3f;
+			probabilities.vertical = 0.5f;
 			break;
 		}
 		}
@@ -101,12 +108,12 @@ public class AntBehaviour : MonoBehaviour {
 	void CheckProbabilities() {
 		switch (movementType) {
 		case MoveType.HORIZONTAL: {
-			if (Random.value < probabilities.horizontal) {
+			if (Random.value < probabilities.horizontal * indicatorMultiplier) {
 				MoveLandSlide(-1);
 			} else {
 				movementType = MoveType.NONE;
-				probabilities.horizontal += 0.1f;
-				probabilities.vertical /= 1.5f;
+				//probabilities.horizontal += 0.1f;
+				//probabilities.vertical /= 1.5f;
 			}
 			break;
 		}
@@ -115,7 +122,8 @@ public class AntBehaviour : MonoBehaviour {
 				MoveLandSlide(-2);
 			} else {
 				movementType = MoveType.NONE;
-				probabilities.vertical *= 1.5f;
+                probabilities.horizontal *= additionalLandSlideChance_vertical;
+                probabilities.vertical *= additionalLandSlideChance_vertical;
 			}
 			break;
 		}
@@ -123,7 +131,7 @@ public class AntBehaviour : MonoBehaviour {
 			movementType = MoveType.NONE;
 			ResetProbabilities();
 			break;
-		}
+		    }
 		}
 	}
 
@@ -199,16 +207,25 @@ public class AntBehaviour : MonoBehaviour {
 		//if not currently moving, allow new movement based on user input
 		if (movementType == MoveType.NONE) {
 			if (Input.GetKeyDown (KeyCode.UpArrow)) {
-				MoveVertical(1);
+                StopIndicator();
+                MoveVertical(1);
 			} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
-				MoveVertical(-1);
+                StopIndicator();
+                MoveVertical(-1);
 			} else if (Input.GetKeyDown (KeyCode.LeftArrow)) {
-				MoveHorizontal (-1);
+                StopIndicator();
+                MoveHorizontal (-1);
 			} else if (Input.GetKeyDown (KeyCode.RightArrow)) {
-				MoveHorizontal (1);
+                StopIndicator();
+                MoveHorizontal (1);
 			}
 		}
 		//always update the ant movement
 		UpdateMovement();
 	}
+
+    void StopIndicator()
+    {
+        //Stop the indicator and start new frame
+    }
 }
