@@ -1,11 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/AntBehaviour.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GlobalState.cs">
     <Files>
-      <File FileName="Assets/Scripts/AntBehaviour.cs" Line="192" Column="24" />
-      <File FileName="Assets/Scripts/GridMaker.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/InGameGUI.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GlobalState.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\AntLion.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GlobalState.cs" Line="18" Column="28" />
+      <File FileName="Assets\Scripts\AntBehaviour.cs" Line="72" Column="20" />
+      <File FileName="Assets\Scripts\GridMaker.cs" Line="39" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

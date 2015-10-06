@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class AntBehaviour : MonoBehaviour {
@@ -8,6 +9,7 @@ public class AntBehaviour : MonoBehaviour {
 	private GlobalState globalState;
 	private GameObject cameraObject;
 	private GameObject sand;
+	private GameObject landslideIndicator;
 	private Bounds antBounds;
 
 	Vector2 antPos;
@@ -16,6 +18,7 @@ public class AntBehaviour : MonoBehaviour {
 
     float indicatorPeriod = 1.0f; //The time required to make one trip from edge to edge for indicator bar
     float indicatorMultiplier = 0f; //The multiplier to the current chance
+	float indicatorCurrentValue = 0f;
     float INDICATOR_MAX_MULTIPLIER = 2.0f;
     float INDICATOR_MIN_MULTIPLIER = 0f;
     float additionalLandSlideChance_vertical = 1.2f; //The probability multiplier each time a vertical move succeeds
@@ -39,7 +42,9 @@ public class AntBehaviour : MonoBehaviour {
 		DebugUtils.Assert (sand);
 		cameraObject = GameObject.Find ("Main Camera");
 		DebugUtils.Assert(cameraObject);
-
+		landslideIndicator = GameObject.Find("MySlider");
+		DebugUtils.Assert (landslideIndicator);
+	
 
 		//make sure we have a global state - create one if it's missing (probably started scene from within Unity editor)
 		GameObject glob = GameObject.Find ("GlobalState");
@@ -177,6 +182,7 @@ public class AntBehaviour : MonoBehaviour {
 		float camy = Mathf.Max (sandBounds.min.y + cam.orthographicSize, transform.position.y - 1.0f + antBounds.extents.y);
 		camy = Mathf.Min (sandBounds.max.y - cam.orthographicSize, camy);
 		cameraObject.transform.position = new Vector3(camx, camy, cameraObject.transform.position.z);
+		landslideIndicator.transform.position = new Vector3 (landslideIndicator.transform.position.x, camy, landslideIndicator.transform.position.z);
 
 	}
 	
@@ -202,8 +208,30 @@ public class AntBehaviour : MonoBehaviour {
 		InitializeMovement();
 	}
 
+	private bool isIncreasing = true;
+	private bool isDecreasing = false;
+
 	// Update is called once per frame
 	void Update () {
+		Slider mySlider = landslideIndicator.GetComponent<Slider> ();
+		if (mySlider.value <= 0) {
+			isIncreasing = true;
+			isDecreasing = false;
+		}
+		if (mySlider.value >= 2) {
+			isDecreasing = true;
+			isIncreasing = false;
+		}
+		if (isIncreasing) {
+			mySlider.value = mySlider.value + 0.033f;
+			indicatorCurrentValue = mySlider.value;
+		}
+		if (isDecreasing) {
+			mySlider.value = mySlider.value - 0.033f;
+			indicatorCurrentValue = mySlider.value;
+		}
+
+
 		//if not currently moving, allow new movement based on user input
 		if (movementType == MoveType.NONE) {
 			if (Input.GetKeyDown (KeyCode.UpArrow)) {
@@ -226,6 +254,10 @@ public class AntBehaviour : MonoBehaviour {
 
     void StopIndicator()
     {
-        //Stop the indicator and start new frame
+        //Stop the indicator and re-evaludate the chance
+        //indicatorMultiplier = (INDICATOR_MAX_MULTIPLIER - INDICATOR_MIN_MULTIPLIER) * respective position of bar
+        
+        //Re-initiate indicator within 3 seconds
+        
     }
 }

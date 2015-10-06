@@ -31,6 +31,7 @@ public class InGameGUI : MonoBehaviour {
 				Application.LoadLevel("Menu");
 			}
 			break;
+		
 		}
 	}
 }
