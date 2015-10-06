@@ -10,6 +10,7 @@ public class AntBehaviour : MonoBehaviour {
 	private GameObject cameraObject;
 	private GameObject sand;
 	private GameObject landslideIndicator;
+    private GameObject textDisplay;
 	private Bounds antBounds;
 
 	Vector2 antPos;
@@ -44,10 +45,11 @@ public class AntBehaviour : MonoBehaviour {
 		DebugUtils.Assert(cameraObject);
 		landslideIndicator = GameObject.Find("MySlider");
 		DebugUtils.Assert (landslideIndicator);
-	
+        textDisplay = GameObject.Find("MyChanceDisplay");
+        DebugUtils.Assert(textDisplay);
 
-		//make sure we have a global state - create one if it's missing (probably started scene from within Unity editor)
-		GameObject glob = GameObject.Find ("GlobalState");
+        //make sure we have a global state - create one if it's missing (probably started scene from within Unity editor)
+        GameObject glob = GameObject.Find ("GlobalState");
 		if (glob) {
 			globalState = glob.GetComponent<GlobalState>();
 		} else {
@@ -142,7 +144,9 @@ public class AntBehaviour : MonoBehaviour {
 
 	//update the ant location, and handle the current movement
 	void UpdateMovement() {
-		Vector3 movement = Vector3.zero;
+        Text textBox = textDisplay.GetComponent<Text>();
+        textBox.text = indicatorMultiplier.ToString();
+        Vector3 movement = Vector3.zero;
 		if (inSuspense) {
 			if (suspenseStartTime + 1.0f < Time.time) {
 				CheckProbabilities();
@@ -183,8 +187,9 @@ public class AntBehaviour : MonoBehaviour {
 		camy = Mathf.Min (sandBounds.max.y - cam.orthographicSize, camy);
 		cameraObject.transform.position = new Vector3(camx, camy, cameraObject.transform.position.z);
 		landslideIndicator.transform.position = new Vector3 (landslideIndicator.transform.position.x, camy, landslideIndicator.transform.position.z);
+        textDisplay.transform.position = new Vector3(textDisplay.transform.position.x, camy, textDisplay.transform.position.z);
 
-	}
+    }
 	
 	void MoveLandSlide(int steps) {
 		MoveVertical(steps, true);
@@ -234,7 +239,15 @@ public class AntBehaviour : MonoBehaviour {
 
 		//if not currently moving, allow new movement based on user input
 		if (movementType == MoveType.NONE) {
-			if (Input.GetKeyDown (KeyCode.UpArrow)) {
+            if (indicatorCurrentValue <= 1)
+            {
+                indicatorMultiplier = -2f * indicatorCurrentValue + (INDICATOR_MAX_MULTIPLIER * 2f / INDICATOR_MAX_MULTIPLIER);
+            }
+            else
+            {
+                indicatorMultiplier = 2f * indicatorCurrentValue - (INDICATOR_MAX_MULTIPLIER * 2f / INDICATOR_MAX_MULTIPLIER);
+            }
+            if (Input.GetKeyDown (KeyCode.UpArrow)) {
                 StopIndicator();
                 MoveVertical(1);
 			} else if (Input.GetKeyDown (KeyCode.DownArrow)) {
