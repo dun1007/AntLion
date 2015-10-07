@@ -9,7 +9,7 @@ public class GlobalState : MonoBehaviour {
 	public enum Difficulty {EASY, MEDIUM, HARD};
 	public Difficulty difficulty;
 
-	public enum GameState {MENU, PLAYING, LOST, WON};
+	public enum GameState {MENU, PLAYING, LOST, WON, UPGRADE};
 	public GameState globalState;
 
 	// Use this for initialization

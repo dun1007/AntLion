@@ -12,6 +12,8 @@ public class AntBehaviour : MonoBehaviour {
 	private GameObject landslideIndicator;
     private GameObject chanceDisplay;
 	private GameObject timerDisplay;
+    private GameObject stageDisplay;
+    private GameObject finalChanceDisplay;
 	private Bounds antBounds;
 
 	Vector2 antPos;
@@ -26,6 +28,7 @@ public class AntBehaviour : MonoBehaviour {
     float additionalLandSlideChance_vertical = 1.2f; //The probability multiplier each time a vertical move succeeds
 	float currentStageTime = 0f; //The time elapsed since the start of stage
 	float TIME_LIMIT = 90f; // Time limit per stage
+    float currentStage = 1f; // The current stage
     
 	struct SlideProbs {public float horizontal; public float vertical;}
 	SlideProbs probabilities = new SlideProbs { horizontal = 0.1f, vertical = 0.5f };
@@ -52,6 +55,12 @@ public class AntBehaviour : MonoBehaviour {
 		DebugUtils.Assert(chanceDisplay);
 		timerDisplay = GameObject.Find("MyStageTimer");
 		DebugUtils.Assert(timerDisplay);
+        stageDisplay = GameObject.Find("MyStageIndicator");
+        DebugUtils.Assert(stageDisplay);
+        Text txt = stageDisplay.GetComponent<Text>();
+        txt.text = "STAGE " + currentStage.ToString();
+        finalChanceDisplay = GameObject.Find("MyLandslideChance");
+        DebugUtils.Assert(finalChanceDisplay);
 
         //make sure we have a global state - create one if it's missing (probably started scene from within Unity editor)
         GameObject glob = GameObject.Find ("GlobalState");
@@ -109,6 +118,8 @@ public class AntBehaviour : MonoBehaviour {
 	public GlobalState.GameState CheckWinLose() {
 		if (antPos.y >= gridMaker.gridSizeVertical)
 		{
+            currentStage = currentStage + 1f;
+            indicatorPeriod = indicatorPeriod - 0.5f;
 			return GlobalState.GameState.WON;
 		} else if (antPos.y < 0 || currentStageTime > 90) {
 			return GlobalState.GameState.LOST;
@@ -150,8 +161,9 @@ public class AntBehaviour : MonoBehaviour {
 	//update the ant location, and handle the current movement
 	void UpdateMovement() {
 		Text textBox = chanceDisplay.GetComponent<Text>();
-        textBox.text = indicatorMultiplier.ToString();
-
+        textBox.text =  "The Landslide Chance Multiplier:" + indicatorMultiplier.ToString();
+        Text textBox2 = finalChanceDisplay.GetComponent<Text>();
+        textBox2.text = "Current Landslide Chance:" + (probabilities.vertical * indicatorMultiplier * 100) + "%";
         Vector3 movement = Vector3.zero;
 		if (inSuspense) {
 			if (suspenseStartTime + 1.0f < Time.time) {
@@ -195,6 +207,8 @@ public class AntBehaviour : MonoBehaviour {
 		landslideIndicator.transform.position = new Vector3 (landslideIndicator.transform.position.x, camy, landslideIndicator.transform.position.z);
 		chanceDisplay.transform.position = new Vector3(chanceDisplay.transform.position.x, camy, chanceDisplay.transform.position.z);
 		timerDisplay.transform.position = new Vector3(timerDisplay.transform.position.x, camy+2.0f, timerDisplay.transform.position.z);
+        stageDisplay.transform.position = new Vector3(stageDisplay.transform.position.x, camy + 2.0f, stageDisplay.transform.position.z);
+        finalChanceDisplay.transform.position = new Vector3(finalChanceDisplay.transform.position.x, camy - 1.5f, finalChanceDisplay.transform.position.z);
     }
 	
 	void MoveLandSlide(int steps) {
